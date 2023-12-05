@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import '../core/firestore_service.dart';
 
 class CadastraPage extends StatefulWidget {
@@ -10,28 +13,54 @@ class CadastraPage extends StatefulWidget {
 
   @override
   State<CadastraPage> createState() => _CadastraPageState();
+
 }
 
 class _CadastraPageState extends State<CadastraPage> {
   final txtLugar = TextEditingController();
   final txtcep = TextEditingController();
   final txtDescricao = TextEditingController();
+  final txtInicio = TextEditingController();
+  final txtFim = TextEditingController();
+
   String apiKey = '4056057b4a664cfabbc224552233008';
+  final cepFocusNode = FocusNode(); 
+
 
   @override
   void initState() {
     super.initState();
     _carregarDados();
+    cepFocusNode.addListener(() {
+      if (!cepFocusNode.hasFocus) {
+        _consultarEnderecoPorCep();
+      }
+      });
   }
 
   void _carregarDados() async {
-    if (widget.id != null) {
-      final dados = await FirestoreService().buscaPorId(widget.id!);
-      txtLugar.text = dados?['lugar'];
-      txtcep.text = dados?['cep'];
-      txtDescricao.text = dados?['descricao'];
+  try {
+    final dados = await FirestoreService().buscaPorId(widget.id!);
+
+    if (dados != null) {
+      txtLugar.text = dados['lugar'];
+      txtcep.text = dados['cep'].toString();
+      txtDescricao.text = dados['descricao'];
+      if (dados['inicio'] != null) {
+        txtInicio.text = DateFormat('dd/MM/yyyy').format(dados['inicio'].toDate());
+      }
+      if (dados['fim'] != null) {
+        txtFim.text = DateFormat('dd/MM/yyyy').format(dados['fim'].toDate());
+      }
     }
+  } catch (e) {
+    print('Erro ao carregar dados para edição: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Erro ao carregar dados para edição')),
+    );
   }
+}
+
 
   Future<void> _consultarEnderecoPorCep() async {
     final cep = txtcep.text;
@@ -53,6 +82,19 @@ class _CadastraPageState extends State<CadastraPage> {
     }
   }
 
+  Future<void> _mostrarDatePicker(TextEditingController controller) async {
+    final DateTime? dataEscolhida = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+
+    if (dataEscolhida != null && dataEscolhida != DateTime.now()) {
+      controller.text = DateFormat('dd/MM/yyyy').format(dataEscolhida);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +107,8 @@ class _CadastraPageState extends State<CadastraPage> {
           children: [
             TextField(
               controller: txtcep,
+              focusNode: cepFocusNode, 
+              onEditingComplete: () => FocusScope.of(context).nextFocus(), 
               decoration: const InputDecoration(labelText: 'CEP:'),
             ),
             const SizedBox(
@@ -84,13 +128,37 @@ class _CadastraPageState extends State<CadastraPage> {
             const SizedBox(
               height: 20,
             ),
-            ElevatedButton(
-              onPressed: () async {
-                await _consultarEnderecoPorCep(); 
+              TextField(
+              controller: txtInicio,
+              readOnly: true, 
+              onTap: () => _mostrarDatePicker(txtInicio),
+              decoration: const InputDecoration(labelText: 'Início:'),
+              ),
+            const SizedBox(
+              height: 20,
+            ),  
+            TextField(
+              controller: txtFim,
+              readOnly: true, 
+              onTap: () => _mostrarDatePicker(txtFim),
+              decoration: const InputDecoration(labelText: 'Fim:'),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+           ElevatedButton(
+            onPressed: () async {
+              try {
+                await _consultarEnderecoPorCep();
+                final inicioDateTime = DateFormat('dd/MM/yyyy').parse(txtInicio.text);
+                final fimDateTime = DateFormat('dd/MM/yyyy').parse(txtFim.text);
+
                 final idGerado = await FirestoreService().gravar(
                   txtLugar.text,
-                  txtcep.text,
+                  int.parse(txtcep.text), 
                   txtDescricao.text,
+                  inicioDateTime,
+                  fimDateTime,
                   id: widget.id,
                 );
                 widget.id = idGerado;
@@ -98,9 +166,22 @@ class _CadastraPageState extends State<CadastraPage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Cadastrado com sucesso')),
                 );
-              },
-              child: const Text('Salvar'),
-            ),
+
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
+              } catch (e) {
+                print('Erro ao salvar: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Erro ao salvar')),
+                );
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+
           ],
         ),
       ),

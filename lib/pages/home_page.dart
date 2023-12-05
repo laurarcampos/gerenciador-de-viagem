@@ -4,7 +4,7 @@ import 'package:firebase_app/pages/mostra_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +14,12 @@ class HomePage extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
-        child:  Column(
+        child: Column(
           children: [
-
             StreamBuilder(
-              stream: FirestoreService().listar().snapshots(), 
-              builder: (context, snapshot){
-                if(!snapshot.hasData){
+              stream: FirestoreService().listar().snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
                   return CircularProgressIndicator();
                 }
                 final dados = snapshot.data!.docs;
@@ -28,7 +27,7 @@ class HomePage extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: dados.length,
                   itemBuilder: (context, index) {
-                    return  ListTile(
+                    return ListTile(
                       title: Text(dados[index]['lugar']),
                       subtitle: Text("${dados[index]['cep']} - ${dados[index]['descricao']}"),
                       trailing: _criarBotoes(context, dados[index].id),
@@ -38,10 +37,10 @@ class HomePage extends StatelessWidget {
               },
             ),
           ],
-        )
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => CadastraPage(),
@@ -49,42 +48,43 @@ class HomePage extends StatelessWidget {
           );
         },
         child: const Icon(Icons.add),
-        ),
+      ),
     );
   }
-  
-  _criarBotoes(BuildContext context, String chave) {
+
+  Widget _criarBotoes(BuildContext context, String chave) {
     return SizedBox(
       width: 100,
       child: Row(
         children: [
-          IconButton(onPressed: (){
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => CadastraPage(id: chave),
-              ),
-            );
-          }, 
-          icon: Icon(Icons.edit),
-          ),
-          IconButton(onPressed: (){
-            FirestoreService().remover(chave); 
-          }, 
-          icon: Icon(Icons.delete),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CadastraPage(id: chave),
+                ),
+              );
+            },
+            icon: Icon(Icons.edit),
           ),
           IconButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => MostraPage(id: chave),
-              ),
-            );
-          },
-          icon: Icon(Icons.visibility),
-        ),
-
+            onPressed: () {
+              FirestoreService().remover(chave);
+            },
+            icon: Icon(Icons.delete),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MostraPage(id: chave),
+                ),
+              );
+            },
+            icon: Icon(Icons.visibility),
+          ),
         ],
       ),
     );
   }
-} 
+}

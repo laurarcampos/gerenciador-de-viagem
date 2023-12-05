@@ -1,4 +1,5 @@
 import 'package:firebase_app/core/auth_service.dart';
+import 'package:firebase_app/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -44,14 +45,14 @@ class _NovaContaState extends State<NovaConta> {
               
               final usuario = await AuthService().novaConta(txtEmail.text, txtSenha.text);
               
-              if(usuario != null){
-                Navigator.of(context).pop(
-                  {
-                  'email': txtEmail.text,
-                  'senha': txtSenha.text
+              if (usuario != null) {
+                    // A conta foi criada com sucesso, agora você pode navegar para a HomePage
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(),
+                      ),
+                    );
                   }
-                );
-              }
               } on FirebaseAuthException catch(ex){
                 var message = '';
                 if(ex.code == 'email-already-in-use'){
