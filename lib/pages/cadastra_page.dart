@@ -167,7 +167,7 @@ class _CadastraPageState extends State<CadastraPage> {
                   const SnackBar(content: Text('Cadastrado com sucesso')),
                 );
 
-                Navigator.of(context).pushReplacement(
+                Navigator.of(context).pop(
                   MaterialPageRoute(
                     builder: (context) => HomePage(),
                   ),

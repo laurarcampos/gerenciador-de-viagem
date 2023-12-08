@@ -2,10 +2,9 @@ import 'package:firebase_app/core/auth_service.dart';
 import 'package:firebase_app/pages/home_page.dart';
 import 'package:firebase_app/pages/nova_conta_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -14,6 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
+  // classe de logica
   final authService = AuthService();
 
   @override
@@ -27,46 +27,60 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                labelText: 'Email',
+                label: Text('Email'),
               ),
             ),
             TextField(
               controller: _senhaController,
               decoration: const InputDecoration(
-                labelText: 'Senha',
+                label: Text('Senha'),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
             ElevatedButton(
-              onPressed: () {
-                authService.login(
+              onPressed: () async {
+                final usuario = await authService.login(
                   _emailController.text,
                   _senhaController.text,
                 );
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
+                if(usuario == null){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Usuário ou senha inválido'),
+                      backgroundColor:Colors.red,
+                      )
+                  );
+                }else{  
+                  Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: 
+                  (context) => HomePage()
+                  ),
+                  );
+                }
               },
-              child: const Text('Login'),
+              child: const Text('Entrar'),
             ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NovaConta()),
+            TextButton(onPressed: (){
+              Navigator.push(context, 
+              MaterialPageRoute(builder: (context) => NovaConta()
+              )).then((value){
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Conta criada com sucesso'),
+                  ),
                 );
-              },
-              child: const Text('Você é novo por aqui?'),
+              })
+              ;
+            }, 
+            child: const Text('Ainda não possuo uma conta'),
             ),
           ],
         ),
       ),
-    );
+    );  
   }
 }

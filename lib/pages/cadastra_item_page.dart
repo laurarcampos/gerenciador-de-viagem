@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -13,25 +12,22 @@ class CadastraItem extends StatefulWidget {
 
   @override
   State<CadastraItem> createState() => _CadastraItemState();
-
 }
 
 class _CadastraItemState extends State<CadastraItem> {
   final txtItem = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
     _carregarDados();
-   
   }
 
   void _carregarDados() async {
     if (widget.id != null) {
       final dados = await FirestoreService().buscaPorId(widget.id!);
       txtItem.text = dados?['itens'];
-      }
+    }
   }
 
   @override
@@ -44,7 +40,6 @@ class _CadastraItemState extends State<CadastraItem> {
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
-            
             TextField(
               controller: txtItem,
               decoration: const InputDecoration(labelText: 'Item:'),
@@ -52,34 +47,28 @@ class _CadastraItemState extends State<CadastraItem> {
             const SizedBox(
               height: 20,
             ),
-           ElevatedButton(
-            onPressed: () async {
-              try {
-                final idGerado = await FirestoreService().gravarItem(
-                  txtItem.text,
-                  id: widget.id,
-                );
-                widget.id = idGerado;
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await FirestoreService().adicionarItem(
+                    widget.id!,
+                    txtItem.text,
+                  );
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cadastrado com sucesso')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Item cadastrado com sucesso')),
+                  );
 
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                  ),
-                );
-              } catch (e) {
-                print('Erro ao salvar: $e');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Erro ao salvar')),
-                );
-              }
-            },
-            child: const Text('Salvar'),
-          ),
-
+                  Navigator.of(context).pop(); 
+                } catch (e) {
+                  print('Erro ao salvar item: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Erro ao salvar o item')),
+                  );
+                }
+              },
+              child: const Text('Salvar'),
+            ),
           ],
         ),
       ),

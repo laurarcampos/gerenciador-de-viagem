@@ -14,6 +14,7 @@ class FirestoreService {
           'descricao': descricao,
           'inicio': inicio,
           'fim': fim,
+          'itens': [], // Adicione uma lista vazia de itens
         });
 
         return id;
@@ -24,29 +25,7 @@ class FirestoreService {
           'descricao': descricao,
           'inicio': inicio,
           'fim': fim,
-        });
-
-        return ref.id;
-      }
-    } catch (e) {
-      print('Erro ao gravar no Firestore: $e');
-      throw e;
-    }
-  }
-
-  Future<String> gravarItem(String novoItem, {String? id}) async {
-    try {
-      if (id != null) {
-        final itemDoc = _firestore.collection('itens').doc(id);
-
-        await itemDoc.set({
-          'item': novoItem,
-        });
-
-        return id;
-      } else {
-        final ref = await _firestore.collection('itens').add({
-          'item': novoItem,
+          'itens': [], // Adicione uma lista vazia de itens
         });
 
         return ref.id;
@@ -62,10 +41,11 @@ class FirestoreService {
       await _firestore
           .collection('viagem')
           .doc(viagemId)
-          .collection('itens')
-          .add({'item': item});
+          .update({
+            'itens': FieldValue.arrayUnion([item]),
+          });
     } catch (e) {
-      print('Erro ao adicionar item: $e');
+      print('Erro ao adicionar item à viagem: $e');
       throw e;
     }
   }
@@ -83,6 +63,23 @@ class FirestoreService {
     }
   }
 
+ Future<void> removerItem(String viagemId, String item) async {
+    try {
+      await _firestore
+          .collection('viagem')
+          .doc(viagemId)
+          .update({
+            'itens': FieldValue.arrayRemove([item]),
+          });
+
+      print('Item removido com sucesso: $item');
+    } catch (e) {
+      print('Erro ao remover o item: $e');
+      throw e;
+    }
+  }
+
+
   Future<Map<String, dynamic>?> buscaPorId(String id) async {
     try {
       final snap = await _firestore.collection('viagem').doc(id).get();
@@ -93,23 +90,21 @@ class FirestoreService {
     }
   }
 
-  Stream<List<String>> getItensViagem(String viagemId) {
-    try {
-      return _firestore
-          .collection('viagem')
-          .doc(viagemId)
-          .collection('itens')
-          .snapshots()
-          .map(
-            (QuerySnapshot snapshot) {
-              return snapshot.docs.map((DocumentSnapshot document) {
-                return document['item'] as String;
-              }).toList();
-            },
-          );
-    } catch (e) {
-      print('Erro ao obter itens da viagem: $e');
-      throw e;
-    }
+ Stream<List<String>> getItensViagem(String viagemId) {
+  try {
+    return _firestore
+        .collection('viagem')
+        .doc(viagemId)
+        .snapshots()
+        .map(
+          (DocumentSnapshot snapshot) {
+            final List<dynamic> itens = snapshot['itens'] ?? [];
+            return itens.map((item) => item.toString()).toList();
+          },
+        );
+  } catch (e) {
+    print('Erro ao obter itens da viagem: $e');
+    throw e;
   }
+}
 }

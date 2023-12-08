@@ -57,31 +57,37 @@ class HomePage extends StatelessWidget {
       width: 100,
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CadastraPage(id: chave),
-                ),
-              );
-            },
-            icon: Icon(Icons.edit),
+          Flexible(
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CadastraPage(id: chave),
+                  ),
+                );
+              },
+              icon: Icon(Icons.edit),
+            ),
           ),
-          IconButton(
-            onPressed: () {
-              FirestoreService().remover(chave);
-            },
-            icon: Icon(Icons.delete),
+          Flexible(
+            child: IconButton(
+              onPressed: () {
+                FirestoreService().remover(chave);
+              },
+              icon: Icon(Icons.delete),
+            ),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MostraPage(id: chave),
-                ),
-              );
-            },
-            icon: Icon(Icons.visibility),
+          Flexible(
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MostraPage(id: chave),
+                  ),
+                );
+              },
+              icon: Icon(Icons.visibility),
+            ),
           ),
         ],
       ),

@@ -14,6 +14,7 @@ class AuthService {
       return usuario;
     } on FirebaseAuthException catch (ex) {
       print(ex);
+      
     }
   }
 
