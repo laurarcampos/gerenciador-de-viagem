@@ -1,17 +1,19 @@
-# firebase_app
+# Gerenciador de viagem
 
-A new Flutter project.
+Projeto desenvolvido para a disciplina de dispositivos móveis 2023 do curso de Sistemas de Informação - IFFAR - Campus São Borja.
 
-## Getting Started
+## Sobre o que é?
 
-This project is a starting point for a Flutter application.
+Esse projeto é um gerencuador de viagem, onde o usuário poderá:
 
-A few resources to get you started if this is your first Flutter project:
+- Criar uma conta;
+- Acessar essa conta;
+- Cadastrar/editar/excluir uma viagem;
+- Visualizar as informações dessa viagem bem como a previsão do tempo;
+- Cadastrar e excluir itens que pretender levar nessa viagem.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# gerenciador-de-viagem
+## Tecnologias utilizadas 
+
+- Firebase para autenticação e armazenamento das informações;
+- Weather API para manipulação do CEP e previsão do tempo

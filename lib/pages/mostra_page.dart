@@ -60,7 +60,7 @@ class _MostraPageState extends State<MostraPage> {
       String apiKey, double latitude, double longitude) async {
     final response = await http.get(
       Uri.parse(
-        'https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$latitude,$longitude&days=5&lang=pt',
+        'https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$latitude,$longitude&days=3&aqi=no&alerts=no',
       ),
     );
 
