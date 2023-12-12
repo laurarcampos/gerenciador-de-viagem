@@ -46,7 +46,6 @@ class _NovaContaState extends State<NovaConta> {
               final usuario = await AuthService().novaConta(txtEmail.text, txtSenha.text);
               
               if (usuario != null) {
-                    // A conta foi criada com sucesso, agora você pode navegar para a HomePage
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => HomePage(),
@@ -67,7 +66,6 @@ class _NovaContaState extends State<NovaConta> {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 print(ex.code);
-
               }
             }, 
             child: const Text('Gravar')

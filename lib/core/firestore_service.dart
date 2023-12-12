@@ -14,7 +14,7 @@ class FirestoreService {
           'descricao': descricao,
           'inicio': inicio,
           'fim': fim,
-          'itens': [], // Adicione uma lista vazia de itens
+          'itens': [], 
         });
 
         return id;
@@ -25,7 +25,7 @@ class FirestoreService {
           'descricao': descricao,
           'inicio': inicio,
           'fim': fim,
-          'itens': [], // Adicione uma lista vazia de itens
+          'itens': [], 
         });
 
         return ref.id;

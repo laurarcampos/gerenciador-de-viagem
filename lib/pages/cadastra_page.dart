@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ class CadastraPage extends StatefulWidget {
 
   @override
   State<CadastraPage> createState() => _CadastraPageState();
-
 }
 
 class _CadastraPageState extends State<CadastraPage> {
@@ -24,8 +22,7 @@ class _CadastraPageState extends State<CadastraPage> {
   final txtFim = TextEditingController();
 
   String apiKey = '4056057b4a664cfabbc224552233008';
-  final cepFocusNode = FocusNode(); 
-
+  final cepFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -35,32 +32,32 @@ class _CadastraPageState extends State<CadastraPage> {
       if (!cepFocusNode.hasFocus) {
         _consultarEnderecoPorCep();
       }
-      });
+    });
   }
 
   void _carregarDados() async {
-  try {
-    final dados = await FirestoreService().buscaPorId(widget.id!);
+    try {
+      final dados = await FirestoreService().buscaPorId(widget.id!);
 
-    if (dados != null) {
-      txtLugar.text = dados['lugar'];
-      txtcep.text = dados['cep'].toString();
-      txtDescricao.text = dados['descricao'];
-      if (dados['inicio'] != null) {
-        txtInicio.text = DateFormat('dd/MM/yyyy').format(dados['inicio'].toDate());
+      if (dados != null) {
+        txtLugar.text = dados['lugar'];
+        txtcep.text = dados['cep'].toString();
+        txtDescricao.text = dados['descricao'];
+        if (dados['inicio'] != null) {
+          txtInicio.text =
+              DateFormat('dd/MM/yyyy').format(dados['inicio'].toDate());
+        }
+        if (dados['fim'] != null) {
+          txtFim.text = DateFormat('dd/MM/yyyy').format(dados['fim'].toDate());
+        }
       }
-      if (dados['fim'] != null) {
-        txtFim.text = DateFormat('dd/MM/yyyy').format(dados['fim'].toDate());
-      }
+    } catch (e) {
+      print('Erro ao carregar dados para edição: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao carregar dados para edição')),
+      );
     }
-  } catch (e) {
-    print('Erro ao carregar dados para edição: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Erro ao carregar dados para edição')),
-    );
   }
-}
-
 
   Future<void> _consultarEnderecoPorCep() async {
     final cep = txtcep.text;
@@ -70,7 +67,7 @@ class _CadastraPageState extends State<CadastraPage> {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        final lugar = jsonResponse['localidade']; 
+        final lugar = jsonResponse['localidade'];
         setState(() {
           txtLugar.text = lugar;
         });
@@ -107,8 +104,8 @@ class _CadastraPageState extends State<CadastraPage> {
           children: [
             TextField(
               controller: txtcep,
-              focusNode: cepFocusNode, 
-              onEditingComplete: () => FocusScope.of(context).nextFocus(), 
+              focusNode: cepFocusNode,
+              onEditingComplete: () => FocusScope.of(context).nextFocus(),
               decoration: const InputDecoration(labelText: 'CEP:'),
             ),
             const SizedBox(
@@ -128,60 +125,61 @@ class _CadastraPageState extends State<CadastraPage> {
             const SizedBox(
               height: 20,
             ),
-              TextField(
+            TextField(
               controller: txtInicio,
-              readOnly: true, 
+              readOnly: true,
               onTap: () => _mostrarDatePicker(txtInicio),
               decoration: const InputDecoration(labelText: 'Início:'),
-              ),
+            ),
             const SizedBox(
               height: 20,
-            ),  
+            ),
             TextField(
               controller: txtFim,
-              readOnly: true, 
+              readOnly: true,
               onTap: () => _mostrarDatePicker(txtFim),
               decoration: const InputDecoration(labelText: 'Fim:'),
             ),
             const SizedBox(
               height: 20,
             ),
-           ElevatedButton(
-            onPressed: () async {
-              try {
-                await _consultarEnderecoPorCep();
-                final inicioDateTime = DateFormat('dd/MM/yyyy').parse(txtInicio.text);
-                final fimDateTime = DateFormat('dd/MM/yyyy').parse(txtFim.text);
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await _consultarEnderecoPorCep();
+                  final inicioDateTime =
+                      DateFormat('dd/MM/yyyy').parse(txtInicio.text);
+                  final fimDateTime =
+                      DateFormat('dd/MM/yyyy').parse(txtFim.text);
 
-                final idGerado = await FirestoreService().gravar(
-                  txtLugar.text,
-                  int.parse(txtcep.text), 
-                  txtDescricao.text,
-                  inicioDateTime,
-                  fimDateTime,
-                  id: widget.id,
-                );
-                widget.id = idGerado;
+                  final idGerado = await FirestoreService().gravar(
+                    txtLugar.text,
+                    int.parse(txtcep.text),
+                    txtDescricao.text,
+                    inicioDateTime,
+                    fimDateTime,
+                    id: widget.id,
+                  );
+                  widget.id = idGerado;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cadastrado com sucesso')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Cadastrado com sucesso')),
+                  );
 
-                Navigator.of(context).pop(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                  ),
-                );
-              } catch (e) {
-                print('Erro ao salvar: $e');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Erro ao salvar')),
-                );
-              }
-            },
-            child: const Text('Salvar'),
-          ),
-
+                  Navigator.of(context).pop(
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
+                } catch (e) {
+                  print('Erro ao salvar: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Erro ao salvar')),
+                  );
+                }
+              },
+              child: const Text('Salvar'),
+            ),
           ],
         ),
       ),
